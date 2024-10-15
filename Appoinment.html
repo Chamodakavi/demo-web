@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Appoinment.css">
+
+    <title>Appoinment form</title>
+</head>
+<body>
+  
+    <form action="Appoinment.php" method="post">
+        <h3>Book an Appointment</h3>
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+        <label for="service">Select Service:</label>
+        <select id="service" name="service">
+            <option value="massage">Massage Therapy</option>
+            <option value="aromatherapy">Aromatherapy</option>
+            <option value="facial">Facial Treatment</option>
+        </select>
+
+        <label for="date">Preferred Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <button type="submit" class="cta-button">Submit</button>
+    </form>
+
+    
+</body>
+</html>
+
+
+
+
+
+
+<?php
+$name = $_POST['name'];
+$email = $_POST['email'];
+$service = $_POST['service'];
+$date = $_POST['date'];
+
+// Database Connection
+$conn = new mysqli('localhost', 'root', '', 'hotel');
+if ($conn->connect_error) {
+    die('Connection Failed: ' . $conn->connect_error);
+} else {
+    // Prepare the SQL statement without the extra comma
+    $stmt = $conn->prepare("INSERT INTO appointment (`FullName`, `Email`, `SelectService`, `PreferredDate`) 
+    VALUES (?, ?, ?, ?)");
+
+    if ($stmt === false) {
+        die('Prepare() failed: ' . htmlspecialchars($conn->error));
+    }
+
+    // Bind parameters as strings
+    $stmt->bind_param("ssss", $name, $email, $service, $date);
+    
+    // Execute the query
+    $stmt->execute();
+
+    // Use JavaScript to show alert and redirect
+    echo "<script>
+            alert('Appointment Confirmed');
+            window.location.href = 'index.html'; // Redirect to the form page
+          </script>";
+
+    // Close statement
+    $stmt->close();
+}
+
+// Close the connection
+$conn->close();
+?>
